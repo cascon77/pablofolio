@@ -6,7 +6,7 @@ import { site } from '../config/site';
 import { profile } from '../data/profile';
 import { projects } from '../data/projects';
 import { withBase } from '../utils/url';
-import { getPosts, postUrl, fmtDate, isoDate } from '../utils/posts';
+import { getPosts, postUrl, termLabel, termUrl, fmtDate, isoDate } from '../utils/posts';
 
 const logs = (await getPosts('hack')).slice(0, 3);
 const featured = projects.filter((p) => p.featured).slice(0, 3);
@@ -43,6 +43,7 @@ const jsonLd = [{ '@context': 'https://schema.org', '@type': 'WebSite', name: si
             <li class="border-line flex items-baseline gap-3 border-b border-dashed py-3 last:border-0">
               <span class="text-or font-mono">{String(i + 1).padStart(2, '0')}</span>
               <a href={postUrl('hack', p)} class="grow text-white hover:text-or">{p.data.title}</a>
+              <a href={termUrl('hack', 'platform', p.data.platform)} class="tag shrink-0 hover:bg-or hover:text-bg">{termLabel('platform', p.data.platform)}</a>
               <time class="text-mute font-mono text-xs" datetime={isoDate(p.data.date)}>{fmtDate(p.data.date)}</time>
             </li>))}</ul>}
       <p class="mt-4"><a href={withBase('/hack/')} class="text-or-soft hover:text-or-hi font-mono text-sm underline underline-offset-4">Ver todos →</a></p>
