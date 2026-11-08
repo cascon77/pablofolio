@@ -1,0 +1,4 @@
+# Evita que Windows rompa scripts y configuración de Linux con saltos de línea CRLF.
+*.sh    text eol=lf
+*.conf  text eol=lf
+*.mjs   text eol=lf

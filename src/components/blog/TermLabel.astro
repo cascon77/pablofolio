@@ -1,0 +1,16 @@
+---
+import { compactTermLabel, termLabel } from '../../utils/posts';
+import type { TaxKey } from '../../config/taxonomy';
+
+interface Props {
+  tax: TaxKey;
+  term: string;
+}
+
+const { tax, term } = Astro.props;
+const fullLabel = termLabel(tax, term);
+const compactLabel = compactTermLabel(tax, term);
+const isCompact = compactLabel !== fullLabel;
+---
+{isCompact && <span class="sm:hidden">{compactLabel}</span>}
+<span class:list={isCompact ? ['hidden', 'sm:inline'] : []}>{fullLabel}</span>

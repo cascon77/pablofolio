@@ -1,0 +1,50 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Avatar from '../components/profile/Avatar.astro';
+import SkillStat from '../components/profile/SkillStat.astro';
+import MissionCard from '../components/profile/MissionCard.astro';
+import AchievementCard from '../components/profile/AchievementCard.astro';
+import SectionTitle from '../components/ui/SectionTitle.astro';
+import ExtLink from '../components/ui/ExtLink.astro';
+import { site, isPlaceholder } from '../config/site';
+import { profile, skills, missions, achievements } from '../data/profile';
+
+const sameAs = [site.github, site.linkedin].filter((u) => !isPlaceholder(u));
+const jsonLd = [{ '@context': 'https://schema.org', '@type': 'Person', name: site.name, jobTitle: profile.headline, url: Astro.site?.href, ...(sameAs.length && { sameAs }) }];
+---
+<BaseLayout title="Profile / CV" description={`Ficha profesional de ${site.name}: perfil, habilidades, experiencia y formación.`} jsonLd={jsonLd}>
+  <section class="reveal box box-hot grid items-center gap-6 sm:grid-cols-[180px_1fr]">
+    <Avatar class="max-w-44" size={360} />
+    <div>
+      <p class="eyebrow">CHARACTER SHEET</p>
+      <h1 class="font-pixel mt-1 text-3xl font-bold md:text-4xl">{site.name}</h1>
+      <p class="text-or-hi mt-2 font-mono">CLASS: {profile.headline}</p>
+      <p class="mt-3 flex gap-5 font-mono text-sm">
+        <ExtLink href={site.github} class="text-or-soft hover:text-or-hi underline underline-offset-4">GitHub</ExtLink>
+        <ExtLink href={site.linkedin} class="text-or-soft hover:text-or-hi underline underline-offset-4">LinkedIn</ExtLink>
+      </p>
+    </div>
+  </section>
+
+  <SectionTitle label="PERFIL" id="perfil" />
+  <div class="grid gap-8 md:grid-cols-[1.3fr_1fr]">
+    <div class="space-y-4">{profile.about.map((t) => <p>{t}</p>)}</div>
+    <div class="box"><p class="eyebrow mb-3">INTERESES</p><p class="flex flex-wrap gap-2">{profile.interests.map((i) => <span class="tag">{i}</span>)}</p></div>
+  </div>
+
+  <SectionTitle label="ATRIBUTOS" id="atributos" />
+  <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">{skills.map((s) => <SkillStat name={s.name} level={s.level} />)}</div>
+
+  <SectionTitle label="MISIONES COMPLETADAS" id="misiones" />
+  <div class="space-y-6">{missions.map((m) => <MissionCard m={m} />)}</div>
+
+  <SectionTitle label="LOGROS DESBLOQUEADOS" id="logros" />
+  <div class="grid gap-6 md:grid-cols-2">{achievements.map((a) => <AchievementCard a={a} />)}</div>
+
+  <SectionTitle label="CONTACTO" id="contacto" />
+  <div class="box flex flex-wrap items-center gap-5 font-mono text-sm">
+    <ExtLink href={site.github} class="btn">GitHub</ExtLink>
+    <ExtLink href={site.linkedin} class="btn">LinkedIn</ExtLink>
+    {!isPlaceholder(profile.contactEmail) && <a class="btn" href={`mailto:${profile.contactEmail}`}>Email</a>}
+  </div>
+</BaseLayout>

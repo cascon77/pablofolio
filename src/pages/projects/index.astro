@@ -1,0 +1,10 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ProjectCard from '../../components/profile/ProjectCard.astro';
+import { projects } from '../../data/projects';
+---
+<BaseLayout title="Projects" description="Proyectos personales y profesionales.">
+  <p class="eyebrow">SELECT LEVEL</p>
+  <h1 class="h-pixel mt-1 mb-8 text-4xl">PROJECTS</h1>
+  <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">{projects.map((p) => <ProjectCard p={p} />)}</div>
+</BaseLayout>

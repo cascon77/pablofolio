@@ -1,0 +1,16 @@
+---
+import type { Achievement } from '../../data/profile';
+import ExtLink from '../ui/ExtLink.astro';
+import { isPlaceholder } from '../../config/site';
+const { a } = Astro.props as { a: Achievement };
+---
+<article class="box">
+  <div class="flex items-start justify-between gap-3">
+    <p class="eyebrow">ACHIEVEMENT UNLOCKED</p>
+    <span class="tag shrink-0">{a.type}</span>
+  </div>
+  <h3 class="font-pixel mt-1 text-lg text-white">{a.name}</h3>
+  <p class="font-mono text-xs">{a.issuer} · {a.date}</p>
+  <p class="mt-2 text-sm">{a.description}</p>
+  {a.url && !isPlaceholder(a.url) && <ExtLink href={a.url} class="text-or-soft hover:text-or-hi mt-2 inline-block font-mono text-xs underline underline-offset-4">Verificar →</ExtLink>}
+</article>

@@ -1,0 +1,13 @@
+---
+import { site, isPlaceholder } from '../../config/site';
+const year = new Date().getFullYear();
+const ext = (u: string) => (isPlaceholder(u) ? '#' : u);
+---
+<footer class="border-line mt-20 border-t-2 pb-24 md:pb-8">
+  <div class="mx-auto flex max-w-6xl flex-wrap items-center gap-4 px-4 py-6 font-mono text-sm md:px-8">
+    <span>© {year} {site.name}</span>
+    <a class="text-or-soft hover:text-or-hi underline underline-offset-4" href={ext(site.github)} rel="noopener noreferrer me">GitHub</a>
+    <a class="text-or-soft hover:text-or-hi underline underline-offset-4" href={ext(site.linkedin)} rel="noopener noreferrer me">LinkedIn</a>
+    <button type="button" data-fx-toggle aria-pressed="true" class="btn ml-auto !min-h-9 !px-3 !py-1 !text-xs">FX: ON</button>
+  </div>
+</footer>

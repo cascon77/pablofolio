@@ -1,0 +1,12 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { withBase } from '../utils/url';
+---
+<BaseLayout title="404" noindex description="Página no encontrada.">
+  <section class="mx-auto max-w-xl py-16 text-center">
+    <p class="eyebrow">ERROR 404</p>
+    <h1 class="h-pixel my-4 text-5xl glitch">GAME OVER</h1>
+    <p>La página que buscas no existe o todavía está bloqueada.</p>
+    <p class="mt-8"><a class="btn btn-fill" href={withBase('/')}>▶ CONTINUE?</a></p>
+  </section>
+</BaseLayout>

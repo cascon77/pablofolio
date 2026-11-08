@@ -1,0 +1,58 @@
+---
+import { render } from 'astro:content';
+import { getImage } from 'astro:assets';
+import { Image } from 'astro:assets';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Toc from '../../components/blog/Toc.astro';
+import TermLabel from '../../components/blog/TermLabel.astro';
+import { activeBlogs, blogs, type BlogId } from '../../config/blogs';
+import { difficulties, platforms, systems } from '../../config/taxonomy';
+import { site } from '../../config/site';
+import { getPosts, postUrl, blogUrl, termUrl, termLabel, readingMinutes, fmtDate, isoDate, uniqueTags, type Post } from '../../utils/posts';
+
+export async function getStaticPaths() {
+  const out = [];
+  for (const b of activeBlogs) for (const post of await getPosts(b.id)) out.push({ params: { blog: b.base, slug: post.id }, props: { id: b.id, post } });
+  return out;
+}
+const { id, post } = Astro.props as { id: BlogId; post: Post };
+const { Content, headings } = await render(post);
+const d = post.data;
+const tags = uniqueTags(post);
+const def = blogs[id];
+const ogImg = d.cover ? (await getImage({ src: d.cover, width: 1200, format: 'jpg' })).src : undefined;
+const url = new URL(postUrl(id, post), Astro.site).href;
+const jsonLd = [
+  { '@context': 'https://schema.org', '@type': 'BlogPosting', headline: d.title, description: d.description, datePublished: d.date.toISOString(), dateModified: (d.updated ?? d.date).toISOString(), inLanguage: site.lang, mainEntityOfPage: url, author: { '@type': 'Person', name: site.name }, ...(ogImg && { image: new URL(ogImg, Astro.site).href }), keywords: [...d.topics, ...tags].join(', ') },
+  { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [
+    { '@type': 'ListItem', position: 1, name: def.title, item: new URL(blogUrl(id), Astro.site).href },
+    { '@type': 'ListItem', position: 2, name: d.title, item: url } ] },
+];
+const diffColor = { 'very-easy': 'text-ok', easy: 'text-ok', medium: 'text-info', hard: 'text-bad', insane: 'text-wild' } as const;
+---
+<BaseLayout title={d.title} description={d.description} type="article" image={ogImg} publishedTime={d.date} modifiedTime={d.updated} jsonLd={jsonLd}>
+  <nav aria-label="Migas de pan" class="mb-4 font-mono text-sm"><a class="text-or-soft hover:text-or-hi" href={blogUrl(id)}>{def.prompt} cd /{def.base}</a> <span class="text-mute">/ {post.id}</span></nav>
+  <article>
+    <header class="max-w-4xl">
+      <h1 class="font-pixel text-3xl leading-tight font-bold md:text-5xl">{d.title}</h1>
+      <p class="mt-3 text-lg">{d.description}</p>
+      <dl class="box mt-6 grid grid-cols-2 gap-x-6 gap-y-2 font-mono text-sm sm:grid-cols-3">
+        <div><dt class="text-mute">FECHA</dt><dd><time datetime={isoDate(d.date)}>{fmtDate(d.date)}</time></dd></div>
+        {d.updated && <div><dt class="text-mute">ACTUALIZADO</dt><dd><time datetime={isoDate(d.updated)}>{fmtDate(d.updated)}</time></dd></div>}
+        <div><dt class="text-mute">PLATAFORMA</dt><dd><a class="text-or-soft hover:text-or-hi" href={termUrl(id, 'platform', d.platform)}>{platforms[d.platform]}</a></dd></div>
+        {d.machine && <div><dt class="text-mute">MÁQUINA</dt><dd>{d.machine.name}</dd></div>}
+        {d.platform !== 'ctf' && d.difficulty && <div><dt class="text-mute">DIFICULTAD</dt><dd class={diffColor[d.difficulty]}>{difficulties[d.difficulty]}</dd></div>}
+        {d.platform !== 'ctf' && d.os && <div><dt class="text-mute">SISTEMA</dt><dd>{systems[d.os]}</dd></div>}
+        <div><dt class="text-mute">LECTURA</dt><dd>{readingMinutes(post.body)} min</dd></div>
+      </dl>
+      {d.cover && <Image src={d.cover} alt={d.coverAlt ?? ''} width={1200} class="border-line mt-6 w-full border-2" loading="eager" />}
+    </header>
+    <div class="mt-10 grid grid-cols-[minmax(0,1fr)] gap-10 lg:grid-cols-[minmax(0,1fr)_260px]">
+      <div class="lg:order-1"><Toc headings={headings} /></div>
+      <div class="prose-arcade lg:order-0"><Content /></div>
+    </div>
+    <footer class="border-line mt-12 max-w-4xl border-t-2 border-dashed pt-6 font-mono text-sm">
+      <p class="flex flex-wrap gap-2">{[...d.topics.map((t) => ['topic', t] as const), ...tags.map((t) => ['tag', t] as const)].map(([tax, t]) => <a class="tag hover:bg-or hover:text-bg" href={termUrl(id, tax, t)} aria-label={termLabel(tax, t)}><TermLabel tax={tax} term={t} /></a>)}</p>
+    </footer>
+  </article>
+</BaseLayout>

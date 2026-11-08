@@ -1,0 +1,35 @@
+---
+import { Image } from 'astro:assets';
+import type { BlogId } from '../../config/blogs';
+import { difficulties, platforms } from '../../config/taxonomy';
+import TermLabel from './TermLabel.astro';
+import { postUrl, fmtDate, isoDate, uniqueTags, type Post } from '../../utils/posts';
+interface Props { post: Post; blog: BlogId; featured?: boolean }
+const { post, blog, featured = false } = Astro.props;
+const d = post.data;
+const tags = uniqueTags(post);
+const diffColor = { 'very-easy': 'text-ok', easy: 'text-ok', medium: 'text-info', hard: 'text-bad', insane: 'text-wild' } as const;
+---
+<article
+  class:list={['box box-link font-mono relative', featured && 'box-hot']}
+  data-post-card
+  data-platform={d.platform}
+  data-difficulty={d.difficulty ?? ''}
+  data-os={d.os ?? ''}
+  data-topic={d.topics.join(' ')}
+  data-tag={tags.join(' ')}
+>
+  {d.cover && <Image src={d.cover} alt={d.coverAlt ?? ''} width={720} class="border-line mb-4 aspect-video w-full border-2 object-cover" loading="lazy" />}
+  <p class="eyebrow flex flex-wrap gap-x-3">
+    <time datetime={isoDate(d.date)}>{fmtDate(d.date)}</time>
+    <span>{platforms[d.platform]}</span>
+    {d.draft && <span class="text-bad">[BORRADOR]</span>}
+    {d.platform !== 'ctf' && d.difficulty && <span class={diffColor[d.difficulty]}>[{difficulties[d.difficulty].toUpperCase()}]</span>}
+  </p>
+  <h2 class="mt-1 text-xl leading-snug font-bold"><a href={postUrl(blog, post)} class="text-white after:absolute after:inset-0 hover:text-or">{d.title}</a></h2>
+  <p class="mt-2 font-sans text-[.95rem]">{d.description}</p>
+  <p class="mt-3 flex flex-wrap gap-2">
+    {d.topics.map((topic) => <span class="tag"><TermLabel tax="topic" term={topic} /></span>)}
+    {tags.map((tag) => <span class="tag">{tag}</span>)}
+  </p>
+</article>

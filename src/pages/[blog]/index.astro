@@ -1,0 +1,67 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostCard from '../../components/blog/PostCard.astro';
+import { activeBlogs, blogs, type BlogId } from '../../config/blogs';
+import { taxonomies, type TaxKey } from '../../config/taxonomy';
+import { getPosts, collectTerms, compactTermLabel, termUrl } from '../../utils/posts';
+
+export function getStaticPaths() {
+  return activeBlogs.map((b) => ({ params: { blog: b.base }, props: { id: b.id } }));
+}
+const { id } = Astro.props as { id: BlogId };
+const def = blogs[id];
+const posts = await getPosts(id);
+const groups = (Object.keys(taxonomies) as TaxKey[]).map((tax) => ({ tax, label: taxonomies[tax].label, terms: collectTerms(posts, tax) })).filter((g) => g.terms.length);
+---
+<BaseLayout title={def.title} description={def.description}>
+  <p class="eyebrow font-mono">{def.prompt} ls -l /{def.base} <span class="cursor" aria-hidden="true">█</span></p>
+  <h1 class="h-pixel mt-1 text-4xl">{def.label}</h1>
+  <p class="mt-2 max-w-2xl">{def.description}</p>
+
+  <div class="mt-8 grid gap-8 lg:grid-cols-[240px_1fr]">
+    <aside aria-label="Filtros" class="box h-fit font-mono text-sm">
+      <p class="mb-3 text-mute">Puedes combinar varios filtros.</p>
+      <button type="button" class="btn hidden mb-4 w-full justify-center" data-post-filter-reset hidden>Reiniciar filtros</button>
+      {groups.length === 0 && <p class="text-mute">Sin filtros todavía.</p>}
+      {groups.map((g) => (
+        <section class="mb-4 last:mb-0">
+          <h2 class="text-or text-sm font-bold">{g.label.toUpperCase()}</h2>
+          <ul class="mt-1 space-y-1">{g.terms.map(([t, ps]) => (
+            <li>
+              <a href={termUrl(id, g.tax, t)} role="button" class="flex w-full items-center gap-2 text-left hover:text-or aria-pressed:text-or-hi" data-post-filter data-taxonomy={g.tax} data-term={t} aria-pressed="false">
+                <span class="shrink-0" data-filter-mark aria-hidden="true">[ ]</span>
+                <span class="min-w-0 grow whitespace-nowrap">{compactTermLabel(g.tax, t)}</span>
+                <span class="shrink-0 text-mute">({ps.length})</span>
+              </a>
+            </li>))}</ul>
+        </section>))}
+    </aside>
+    <div>
+      <div class="hidden mb-4 flex flex-wrap items-center justify-between gap-3 font-mono text-sm" data-post-pagination hidden>
+        <label class="flex items-center gap-2">
+          <span>Mostrar</span>
+          <select class="border-line bg-bg text-text border-2 px-2 py-2" data-post-page-size aria-label="Artículos por página">
+            <option value="5">5</option>
+            <option value="10" selected>10</option>
+            <option value="20">20</option>
+            <option value="50">50</option>
+            <option value="all">Todos</option>
+          </select>
+          <span>artículos</span>
+        </label>
+        <nav class="hidden flex items-center gap-3" aria-label="Paginación de artículos" data-post-page-nav hidden>
+          <button type="button" class="btn" data-post-page-previous aria-label="Página anterior">Anterior</button>
+          <span class="text-mute" data-post-page-indicator aria-live="polite"></span>
+          <button type="button" class="btn" data-post-page-next aria-label="Página siguiente">Siguiente</button>
+        </nav>
+      </div>
+      <p class="mb-4 font-mono text-sm text-mute" data-post-filter-status role="status" aria-live="polite"></p>
+      <div class="grid content-start gap-6" data-post-filter-list>
+        {posts.length === 0
+          ? <div class="box font-mono text-sm">$ ls /{def.base}<br /><span class="text-mute">total 0 — todavía no hay artículos publicados.</span></div>
+          : posts.map((p, i) => <PostCard post={p} blog={id} featured={i === 0} />)}
+        <div class="box font-mono text-sm" data-post-filter-empty hidden>No hay writeups que coincidan con los filtros seleccionados.</div>
+      </div>
+    </div>
+  </div>
+</BaseLayout>

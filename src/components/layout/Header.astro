@@ -1,0 +1,54 @@
+---
+import PixelIcon from '../ui/PixelIcon.astro';
+import { site } from '../../config/site';
+import { blogs } from '../../config/blogs';
+import { withBase } from '../../utils/url';
+
+const path = Astro.url.pathname;
+type Item = { label: string; short: string; href?: string; icon: 'home' | 'user' | 'folder' | 'terminal' | 'lock'; locked?: boolean };
+const items: Item[] = [
+  { label: 'START', short: 'HOME', href: withBase('/'), icon: 'home' },
+  { label: 'PROFILE', short: 'CV', href: withBase('/profile/'), icon: 'user' },
+  { label: 'PROJECTS', short: 'PROJ', href: withBase('/projects/'), icon: 'folder' },
+  ...Object.values(blogs).map((b): Item =>
+    b.status === 'active'
+      ? { label: b.label, short: 'HACK', href: withBase(`/${b.base}/`), icon: 'terminal' }
+      : { label: b.label, short: 'LAB', icon: 'lock', locked: true }),
+];
+const isOn = (i: Item) => !!i.href && (i.href === withBase('/') ? path === i.href : path.startsWith(i.href));
+---
+<header class="border-b-2 border-line bg-bg/95 sticky top-0 z-50 backdrop-blur-sm">
+  <nav aria-label="Principal" class="mx-auto flex max-w-6xl items-center gap-2 px-4 py-3 md:px-8">
+    <a href={withBase('/')} class="font-pixel text-or mr-auto text-xl font-bold glitch">&gt;_ {site.shortName}</a>
+    <ul class="hidden items-center gap-1 md:flex">
+      {items.map((i) => (
+        <li>
+          {i.locked ? (
+            <span class="text-mute font-pixel px-3 py-2" aria-disabled="true" title="Próximamente">[LOCK] {i.label} <span class="sr-only">(próximamente)</span></span>
+          ) : (
+            <a href={i.href} aria-current={isOn(i) ? 'page' : undefined} class:list={['font-pixel px-3 py-2 hover:text-or', isOn(i) ? 'text-or' : 'text-tx2']}>
+              {isOn(i) && <span aria-hidden="true">▶ </span>}{i.label}
+            </a>
+          )}
+        </li>
+      ))}
+    </ul>
+  </nav>
+</header>
+
+<!-- Móvil: dock inferior (alcance con el pulgar) -->
+<nav aria-label="Principal (móvil)" class="bg-bg2 border-t-2 border-or fixed inset-x-0 bottom-0 z-50 md:hidden" style="padding-bottom: env(safe-area-inset-bottom)">
+  <ul class="flex">
+    {items.map((i) => (
+      <li class="flex-1">
+        {i.locked ? (
+          <span aria-disabled="true" class="text-mute font-pixel flex min-h-14 flex-col items-center justify-center text-xs"><PixelIcon name="lock" />LOCK<span class="sr-only"> Homelab (próximamente)</span></span>
+        ) : (
+          <a href={i.href} aria-current={isOn(i) ? 'page' : undefined} class:list={['font-pixel flex min-h-14 flex-col items-center justify-center gap-0.5 text-xs', isOn(i) ? 'text-or bg-bg' : 'text-tx2']} >
+            <PixelIcon name={i.icon} />{i.short}<span class="sr-only"> ({i.label.toLowerCase()})</span>
+          </a>
+        )}
+      </li>
+    ))}
+  </ul>
+</nav>

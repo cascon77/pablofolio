@@ -1,0 +1,109 @@
+@import "tailwindcss";
+
+@font-face{font-family:"VT323";font-weight:400 700;font-display:swap;src:url(/fonts/vt323-latin-400-normal.woff2) format("woff2")}
+@font-face{font-family:"JetBrains Mono";font-weight:400;font-display:swap;src:url(/fonts/jetbrains-mono-latin-400-normal.woff2) format("woff2")}
+@font-face{font-family:"JetBrains Mono";font-weight:700;font-display:swap;src:url(/fonts/jetbrains-mono-latin-700-normal.woff2) format("woff2")}
+@font-face{font-family:"Inter";font-weight:400;font-display:swap;src:url(/fonts/inter-latin-400-normal.woff2) format("woff2")}
+@font-face{font-family:"Inter";font-weight:600;font-display:swap;src:url(/fonts/inter-latin-600-normal.woff2) format("woff2")}
+
+@theme {
+  --color-bg: #0A0A0A;
+  --color-bg2: #171717;
+  --color-or: #FF6B00;
+  --color-or-hi: #FF9500;
+  --color-or-soft: #FFB366;
+  --color-tx2: #D0D0D0;
+  --color-mute: #8A8A8A;
+  --color-line: #39312B;
+  --color-ok: #5FB37A;
+  --color-info: #6AA9E0;
+  --color-bad: #E5645F;
+  --color-wild: #C792EA;
+  --font-pixel: "VT323", ui-monospace, monospace;
+  --font-mono: "JetBrains Mono", ui-monospace, "Cascadia Code", monospace;
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+@layer base {
+  html { background: var(--color-bg); scroll-behavior: smooth; scroll-padding-top: 5rem; }
+  body { background: var(--color-bg); color: var(--color-tx2); font-family: var(--font-sans); line-height: 1.65; min-height: 100vh; }
+  ::selection { background: var(--color-or); color: #0A0A0A; }
+  a:focus-visible, button:focus-visible, summary:focus-visible { outline: 3px solid var(--color-or-soft); outline-offset: 3px; }
+  h1, h2, h3 { color: #fff; }
+}
+
+/* Scanlines CRT muy sutiles (se apagan con el interruptor FX) */
+body::after { content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 60;
+  background: repeating-linear-gradient(0deg, rgba(255,255,255,.03) 0 1px, transparent 1px 3px); }
+html[data-fx="off"] body::after { display: none; }
+
+/* Transiciones nativas entre páginas (sin JS; si no hay soporte, simplemente no aparecen) */
+@media (prefers-reduced-motion: no-preference) { @view-transition { navigation: auto; } }
+
+@layer components {
+  .box { background: var(--color-bg2); border: 2px solid var(--color-line); box-shadow: 4px 4px 0 var(--color-line); padding: 1.25rem; }
+  .box-hot { border-color: var(--color-or); box-shadow: 4px 4px 0 var(--color-or); }
+  a.box:hover, .box-link:hover { border-color: var(--color-or); box-shadow: 4px 4px 0 var(--color-or), 0 0 22px rgba(255,107,0,.25); }
+  .btn { display: inline-flex; align-items: center; gap: .5rem; min-height: 44px; padding: .55rem 1.25rem; font: 700 .95rem var(--font-pixel);
+    color: var(--color-or); border: 2px solid var(--color-or); box-shadow: 4px 4px 0 var(--color-line); transition: background .15s, color .15s, box-shadow .15s; }
+  .btn:hover { background: var(--color-or-hi); border-color: var(--color-or-hi); color: #0A0A0A; box-shadow: 0 0 18px rgba(255,107,0,.5); }
+  .btn-fill { background: var(--color-or); color: #0A0A0A; }
+  .tag { display: inline-block; font: .75rem var(--font-mono); border: 1px solid var(--color-or); color: var(--color-or-soft); padding: .1rem .5rem; }
+  .eyebrow { font: .8rem var(--font-mono); color: var(--color-or-soft); letter-spacing: .08em; }
+  .h-pixel { font-family: var(--font-pixel); font-weight: 700; color: var(--color-or); }
+  .cursor { color: var(--color-or); }
+  .skip { position: absolute; left: -999px; top: 0; background: var(--color-or); color: #0A0A0A; padding: .5rem 1rem; z-index: 100; }
+  .skip:focus { left: .5rem; top: .5rem; }
+}
+
+/* Animaciones: solo si el usuario no pide reducirlas */
+@media (prefers-reduced-motion: no-preference) {
+  .cursor { animation: blink 1s steps(2) infinite; }
+  .reveal { animation: rise .5s ease-out both; }
+  .glitch:hover { animation: glitch .35s steps(2) 1; }
+  .boot-bar > i { animation: load .9s steps(12) forwards; }
+}
+@keyframes blink { 50% { opacity: 0; } }
+@keyframes rise { from { opacity: 0; transform: translateY(8px); } }
+@keyframes glitch { 0%,100% { text-shadow: none; } 25% { text-shadow: 2px 0 var(--color-or-hi), -2px 0 #fff; } 60% { text-shadow: -2px 0 var(--color-or-hi), 2px 0 #fff; } }
+@keyframes load { from { width: 0; } to { width: 100%; } }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+html[data-fx="off"] *, html[data-fx="off"] *::before, html[data-fx="off"] *::after { animation: none !important; transition: none !important; }
+
+/* Pantalla de arranque (solo primera visita de la sesión, omitible) */
+.boot { position: fixed; inset: 0; z-index: 90; background: var(--color-bg); display: none; place-items: center; text-align: center; }
+.boot.on { display: grid; }
+.boot-bar { width: 240px; height: 16px; border: 2px solid var(--color-or); margin: 1rem auto; }
+.boot-bar > i { display: block; height: 100%; width: 100%; background: var(--color-or); }
+@media (prefers-reduced-motion: reduce) { .boot { display: none !important; } }
+
+/* Artículos */
+.prose-arcade { font-size: 1.0625rem; line-height: 1.8; max-width: 72ch; }
+.prose-arcade h2 { font: 700 1.6rem var(--font-pixel); color: var(--color-or); margin: 2.5rem 0 1rem; }
+.prose-arcade h3 { font: 700 1.25rem var(--font-pixel); color: var(--color-or-soft); margin: 2rem 0 .75rem; }
+.prose-arcade h2::before { content: "> "; color: var(--color-or-hi); }
+.prose-arcade p, .prose-arcade ul, .prose-arcade ol { margin: 1rem 0; }
+.prose-arcade ul { list-style: square; padding-left: 1.4rem; } .prose-arcade ol { list-style: decimal; padding-left: 1.4rem; }
+.prose-arcade li::marker { color: var(--color-or); }
+.prose-arcade a { color: var(--color-or-soft); text-decoration: underline; text-underline-offset: 3px; }
+.prose-arcade a:hover { color: var(--color-or-hi); }
+.prose-arcade strong { color: #fff; }
+.prose-arcade :not(pre) > code { font-family: var(--font-mono); font-size: .9em; background: var(--color-bg2); border: 1px solid var(--color-line); padding: .1em .4em; color: var(--color-or-soft); }
+.prose-arcade img { max-width: 100%; height: auto; border: 2px solid var(--color-line); margin: 1.5rem 0; }
+.prose-arcade blockquote { border-left: 4px solid var(--color-line); padding-left: 1rem; color: var(--color-tx2); }
+.prose-arcade table { width: 100%; border-collapse: collapse; font-size: .95rem; display: block; overflow-x: auto; }
+.prose-arcade th, .prose-arcade td { border: 1px solid var(--color-line); padding: .4rem .7rem; text-align: left; }
+.prose-arcade th { color: var(--color-or-soft); font-family: var(--font-mono); }
+.prose-arcade hr { border: 0; border-top: 2px dashed var(--color-line); margin: 2rem 0; }
+.prose-arcade pre, .prose-arcade code { font-variant-ligatures: none; }
+.prose-arcade pre { position: relative; font: .875rem/1.6 var(--font-mono); background: #0A0A0A !important; border: 2px solid var(--color-line); border-top: 0; padding: 1rem; overflow-x: auto; margin: 0 0 1.5rem; }
+.code-head { display: flex; justify-content: space-between; align-items: center; margin-top: 1.5rem; background: var(--color-bg2); border: 2px solid var(--color-line); padding: .25rem .75rem; font: .75rem var(--font-mono); color: var(--color-or-soft); }
+.code-head button { font: inherit; color: var(--color-or); border: 1px solid var(--color-or); padding: .15rem .6rem; min-height: 28px; }
+.code-head button:hover { background: var(--color-or); color: #0A0A0A; }
+.callout { border: 2px solid var(--color-line); border-left-width: 6px; background: var(--color-bg2); padding: .75rem 1rem; margin: 1.5rem 0; }
+.callout::before { display: block; font: 700 .8rem var(--font-mono); margin-bottom: .25rem; content: attr(data-kind); }
+.callout-note { border-left-color: var(--color-info); } .callout-note::before { color: var(--color-info); }
+.callout-tip { border-left-color: var(--color-ok); } .callout-tip::before { color: var(--color-ok); }
+.callout-warning { border-left-color: var(--color-or); } .callout-warning::before { color: var(--color-or-hi); }
+.callout-danger { border-left-color: var(--color-bad); } .callout-danger::before { color: var(--color-bad); }
+.callout p { margin: .25rem 0; }

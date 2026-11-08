@@ -1,0 +1,13 @@
+---
+interface Props { name: string; level: number | null }
+const { name, level } = Astro.props;
+const rated = level !== null;
+---
+<div class="box !p-4">
+  <div class="flex items-baseline justify-between gap-2">
+    <span class="font-pixel text-lg text-white">{name}</span>
+    <span class="text-or-soft font-mono text-xs">{rated ? `${level}/100` : '[SIN VALORAR]'}</span>
+  </div>
+  <div class="border-line mt-3 h-4 border-2" role={rated ? 'meter' : undefined} aria-label={rated ? `${name}: ${level} de 100` : undefined} aria-valuenow={rated ? level : undefined} aria-valuemin={rated ? 0 : undefined} aria-valuemax={rated ? 100 : undefined}
+    style={rated ? `background: linear-gradient(90deg, #FF6B00 ${level}%, transparent ${level}%)` : 'background: repeating-linear-gradient(90deg, #39312B 0 6px, transparent 6px 12px)'}></div>
+</div>

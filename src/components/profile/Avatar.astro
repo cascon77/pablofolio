@@ -1,0 +1,13 @@
+---
+import { Image } from 'astro:assets';
+import { withBase } from '../../utils/url';
+// Foto opcional: coloca src/assets/profile.jpg (o .png/.webp). Sin ella se muestra un marco con placeholder.
+const found = Object.values(import.meta.glob<ImageMetadata>('/src/assets/profile.{jpg,jpeg,png,webp}', { eager: true, import: 'default' }))[0];
+interface Props { size?: number; class?: string }
+const { size = 480, class: cls = '' } = Astro.props;
+---
+<div class:list={['box box-hot !p-2', cls]}>
+  {found
+    ? <Image src={found} alt="Foto del autor" width={size} height={size} class="aspect-square w-full object-cover" loading="eager" />
+    : <img src={withBase('/og/default.png')} alt="Foto del autor" width={size} height={size} class="aspect-square w-full object-cover" loading="eager" />}
+</div>

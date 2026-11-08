@@ -1,0 +1,16 @@
+---
+import type { MarkdownHeading } from 'astro';
+interface Props { headings: MarkdownHeading[] }
+const items = Astro.props.headings.filter((h) => h.depth === 2 || h.depth === 3);
+---
+{items.length > 1 && (
+  <>
+    <details class="box mb-8 lg:hidden"><summary class="h-pixel cursor-pointer">ÍNDICE</summary>
+      <ol class="mt-3 space-y-1 font-mono text-sm">{items.map((h) => <li class:list={[h.depth === 3 && 'pl-4']}><a class="hover:text-or" href={`#${h.slug}`}>{h.text}</a></li>)}</ol>
+    </details>
+    <nav aria-label="Tabla de contenidos" class="box sticky top-24 hidden max-h-[70vh] overflow-y-auto lg:block">
+      <p class="h-pixel mb-3">ÍNDICE</p>
+      <ol class="space-y-1.5 font-mono text-sm">{items.map((h) => <li class:list={[h.depth === 3 && 'pl-4']}><a class="hover:text-or" href={`#${h.slug}`}>{h.text}</a></li>)}</ol>
+    </nav>
+  </>
+)}

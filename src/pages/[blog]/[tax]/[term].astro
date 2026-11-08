@@ -1,0 +1,27 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import PostCard from '../../../components/blog/PostCard.astro';
+import TermLabel from '../../../components/blog/TermLabel.astro';
+import { activeBlogs, blogs, type BlogId } from '../../../config/blogs';
+import { taxonomies, type TaxKey } from '../../../config/taxonomy';
+import { getPosts, collectTerms, termLabel, blogUrl } from '../../../utils/posts';
+
+export async function getStaticPaths() {
+  const out = [];
+  for (const b of activeBlogs) {
+    const posts = await getPosts(b.id);
+    for (const tax of Object.keys(taxonomies) as TaxKey[])
+      for (const [term, ps] of collectTerms(posts, tax))
+        out.push({ params: { blog: b.base, tax, term }, props: { id: b.id, tax, term, posts: ps } });
+  }
+  return out;
+}
+const { id, tax, term, posts } = Astro.props as { id: BlogId; tax: TaxKey; term: string; posts: Awaited<ReturnType<typeof getPosts>> };
+const label = `${taxonomies[tax].label}: ${termLabel(tax, term)}`;
+---
+<BaseLayout title={`${label} · ${blogs[id].title}`} description={`Artículos de ${blogs[id].title} filtrados por ${label}.`}>
+  <p class="eyebrow font-mono">{blogs[id].prompt} grep -r "{term}" /{blogs[id].base}</p>
+  <h1 class="h-pixel mt-1 text-3xl">{taxonomies[tax].label}: <TermLabel tax={tax} term={term} /></h1>
+  <p class="mt-2 font-mono text-sm"><a class="text-or-soft hover:text-or-hi underline underline-offset-4" href={blogUrl(id)}>← todos los artículos</a></p>
+  <div class="mt-8 grid max-w-4xl gap-6">{posts.map((p) => <PostCard post={p} blog={id} />)}</div>
+</BaseLayout>

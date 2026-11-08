@@ -1,0 +1,9 @@
+---
+import { isPlaceholder } from '../../config/site';
+interface Props { href?: string; class?: string }
+const { href, class: cls } = Astro.props;
+const pending = isPlaceholder(href);
+---
+{pending
+  ? <a href="#" class={cls} aria-disabled="true" title="Enlace pendiente"><slot /></a>
+  : <a href={href} class={cls} rel="noopener noreferrer me" target="_blank"><slot /></a>}
