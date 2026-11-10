@@ -41,7 +41,7 @@ Con esto sabemos que tiene un puerto ssh expuesto y una pagina web a la que post
 ## Análisis
 
 Cuando entramos en la pagina web lo que vemos es escrito "*tails*" estuve dándole vueltas a que podría significar y llegué a la conclusión de que podía ser un usuario y que me avisase de empezar al revés la lista de `rockyou.txt`
-![](AnalisisHedgehog.png)
+![](AnalisisHedghog.png)
 
 ## Explotación
 
