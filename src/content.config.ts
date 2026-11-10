@@ -23,9 +23,6 @@ const hacking = defineCollection({
         machine: z.object({ name: z.string(), retired: z.boolean() }).optional(),
       })
       .superRefine((d, ctx) => {
-        // Los borradores pueden estar incompletos; lo publicado no.
-        if (!d.draft && d.description.length < 20) ctx.addIssue({ code: 'custom', message: 'description: mínimo 20 caracteres para publicar', path: ['description'] });
-        if (!d.draft && d.title.length < 5) ctx.addIssue({ code: 'custom', message: 'title demasiado corto para publicar', path: ['title'] });
         if (d.cover && !d.coverAlt) ctx.addIssue({ code: 'custom', message: 'coverAlt es obligatorio si hay cover (accesibilidad)', path: ['coverAlt'] });
         if (d.platform === 'ctf' && d.difficulty) ctx.addIssue({ code: 'custom', message: 'difficulty solo aplica a laboratorios, no a CTF', path: ['difficulty'] });
         if (d.platform === 'ctf' && d.os) ctx.addIssue({ code: 'custom', message: 'os solo aplica a laboratorios, no a CTF', path: ['os'] });
