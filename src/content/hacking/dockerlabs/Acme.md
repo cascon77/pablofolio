@@ -41,21 +41,21 @@ Con esto sabemos que tiene un puerto ssh expuesto y una pagina web a la que post
 ## Análisis
 
 Empezamos por la pagina web: 
-![Pagina web](Pasted%20image%2020261110002745.png)
+![Pagina web](./imagenes/Pasted%20image%2020261110002745.png)
 
 Como dice probamos con cualquier usuario en ssh
 ```
 ssh cualquier_usuario@172.17.0.2
 ```
 
-![](Pasted%20image%2020261110003117.png)
+![](./imagenes/Pasted%20image%2020261110003117.png)
 
 observamos que el sistema arroja un mensaje de bienvenida o un banner informativo que expone un usuario y contraseña válidos.
 
 ## Explotación
 
 Aprovechando la información filtrada directamente por el servicio SSH, procedemos a realizar la autenticación legítima utilizando las credenciales obtenidas: `ssh usuario_valido@172.17.0.2`
-![](Pasted%20image%2020261110003424.png)
+![](./imagenes/Pasted%20image%2020261110003424.png)
 
 En la cual encontraremos la flag dentro de user.txt
 ## Escalada de privilegios
@@ -67,7 +67,7 @@ Una vez comprobado esto pasé a revisar los permisos especiales en binarios **SU
 find / -perm -4000 -type f 2>/dev/null
 ```
 dándonos los siguientes resultados:
-![](Pasted%20image%2020261110214062.png)
+![](./imagenes/Pasted%20image%2020261110214062.png)
 
 Y los revisamos con [GTFOBins](https://gtfobins.github.io/gtfobins/ruby) dando que el `bash` y el de `dash` son vulnerables a SUID para explotarlos utilizaremos los comandos indicados GTFOBins:
 ```bash
@@ -79,7 +79,7 @@ dash -p
 
 Cualquiera de las dos opciones nos eleva los privilegios pudiendo sacar la flag de root
 
-![](Pasted%20image%2020261110214884.png)
+![](./imagenes/Pasted%20image%2020261110214884.png)
 
 ## Flags o prueba de finalización
 

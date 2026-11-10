@@ -28,7 +28,7 @@ El comando que ejecute para realizar esto fue el siguiente
 nmap -sV -sC --min-rate 5000 -n -Pn 172.17.0.2
 ```
 
-![](EscaneoTProot.png)
+![](./imagenes/EscaneoTProot.png)
 
 | Puerto | Protocolo | Estado | Servicio | Versión                        |
 | ------ | --------- | ------ | -------- | ------------------------------ |
@@ -45,14 +45,14 @@ searchsploit "vsftpd 2.3.4"
 ```
 (Tambien podia haberlo buscado en internet y me saldría el CVE de la vulnerabilidad y con eso y atraves ya sea de github o Exploit-DB tendríamos el ejecutable)
 
-![](BuscaVulnTproot.png)
+![](./imagenes/BuscaVulnTproot.png)
 
 Con esto comprobamos que tienen una vulnerabilidad
 
 ## Explotación
 
 Una vez analizado y detectado esta vulnerabilidad vamos a explotarla, para esto tenemos que descargar el exploit
-![](DescargaComandoTProot.png)
+![](./imagenes/DescargaComandoTProot.png)
 
 Yo antes de ejecutarlo siempre me gusta leerlo un poco por encima para saber que va a pedir y como funciona (sobretodo esto ultimo si nos descargamos exploits de github, esto lo recomiendo desde mi punto de vista de asegurarnos nuestra integridad de la seguridad)
 
@@ -61,17 +61,17 @@ Ejecutamos el exploit:
 python2 49757.py 172.17.0.2
 ```
 
-![](explotacionTProot.png)
+![](./imagenes/explotacionTProot.png)
 
 Y entras siendo ya como usuario root
 
-![](Pasted%20image%2020261110140101.png)
+![](./imagenes/Pasted%20image%2020261110140101.png)
 
 ## Flags o prueba de finalización
 
 Tras revisar las carpetas y buscar en los directorios encontré la flag de esta maquina.
 
-![](flagTProot.png)
+![](./imagenes/flagTProot.png)
 
 ## Mitigaciones y aprendizajes
 

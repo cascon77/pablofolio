@@ -30,7 +30,7 @@ nmap -sV -sC --min-rate 5000 -n -Pn 172.17.0.2
 ```
 
 Dándome como resultado los siguientes puertos abiertos
-![](EscaneoHedgeHog.png)
+![](./imagenes/EscaneoHedgeHog.png)
 
 | Puerto | Protocolo | Estado | Servicio | Versión                        |
 | ------ | --------- | ------ | -------- | ------------------------------ |
@@ -41,7 +41,7 @@ Con esto sabemos que tiene un puerto ssh expuesto y una pagina web a la que post
 ## Análisis
 
 Cuando entramos en la pagina web lo que vemos es escrito "*tails*" estuve dándole vueltas a que podría significar y llegué a la conclusión de que podía ser un usuario y que me avisase de empezar al revés la lista de `rockyou.txt`
-![](AnalisisHedghog.png)
+![](./imagenes/AnalisisHedghog.png)
 
 ## Explotación
 
@@ -56,15 +56,15 @@ hydra -l tails -P final.txt ssh://172.17.0.2 -t4
 ```
 
 Dando como resultado:
-![](HydraHedgehog.png)
+![](./imagenes/HydraHedgehog.png)
 
 ## Escalada de privilegios
 
 Revisamos los usuarios que hay en la maquina:
-![](usuariosHedgedHog.png)
+![](./imagenes/usuariosHedgedHog.png)
 
 Y luego vemos si tenemos permisos de administrador por una mala configuración del sudo con el comando `sudo -l`
-![](noSudoUserHedgeHog.png)
+![](./imagenes/noSudoUserHedgeHog.png)
 
 Vemos que tengo un usuario que puede utilizar sudo sin contraseña asi que vamos a elevar los privilegios:
 
@@ -76,7 +76,7 @@ con esto nos convertimos en el usuario sonic en el cual navegando por su carpeta
 
 ## Flags o prueba de finalización
 
-![](pruebasHedgeHog.png)
+![](./imagenes/pruebasHedgeHog.png)
 
 ## Mitigaciones y aprendizajes
 
